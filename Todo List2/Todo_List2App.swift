@@ -15,6 +15,7 @@ struct Todo_List2App: App {
     
     init() {
             dataService.initializeDefaultUsers()
+        debugPrint("Test")
         }
     
     var body: some Scene {

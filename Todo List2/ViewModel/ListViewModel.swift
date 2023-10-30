@@ -26,7 +26,7 @@ class ListViewModel: ObservableObject {
                 return false
             }
         } catch {
-            debugPrint("Error accessing Realm database: \(error.localizedDescription)")
+            debugPrint("Error accessing Realm database when calling authenticateUser: \(error.localizedDescription)")
             return false
         }
     }
