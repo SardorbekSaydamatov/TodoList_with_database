@@ -7,58 +7,50 @@
 
 import Foundation
 import RealmSwift
+import Firebase
 
 class ListViewModel: ObservableObject {
-    @Published var isAuthenticated = false
+    @Published var isUserLoggedIn = false
+    @Published var user: User?
+    @Published var registrationSucceeded = false
     
-    func authenticateUser(email: String, password: String) -> Bool {
-        do {
-            let realm = try Realm()
-            let users = realm.objects(User.self).filter("email == %@ AND password == %@", email, password)
-            
-            if let user = users.first {
-                UserDefaults.standard.set(true, forKey: "LoggedIn")
-                UserDefaults.standard.set(user.id, forKey: "userName")
-                isAuthenticated = true
-                return true
+    func signIn(email: String, password: String, completion: @escaping (Bool) -> Void) {
+        Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
+            if let error = error {
+                print("Error signing in: \(error.localizedDescription)")
+                completion(false)
             } else {
-                isAuthenticated = false
-                return false
-            }
-        } catch {
-            debugPrint("Error accessing Realm database when calling authenticateUser: \(error.localizedDescription)")
-            return false
-        }
-    }
-    
-    func logout() {
-        UserDefaults.standard.set(false, forKey: "LoggedIn")
-        UserDefaults.standard.removeObject(forKey: "userName")
-        isAuthenticated = false
-    }
-    
-        
-    func registerUser(firstName: String, lastName: String, email: String, password: String) -> Bool {
-        do {
-            let realm = try Realm()
-            let existingUser = realm.objects(User.self).filter("email == %@", email)
-            if existingUser.isEmpty {
-                let newUser = User()
-                newUser.id = UUID().uuidString
-                newUser.firstName = firstName
-                newUser.lastName = lastName
-                newUser.email = email
-                newUser.password = password
-                
-                try realm.write {
-                    realm.add(newUser)
+                self.isUserLoggedIn = true
+                if let user = authResult?.user {
+                    UserDefaults.standard.set(user.uid, forKey: "userID")
+                    debugPrint("********* \(UserDefaults.standard.string(forKey: "userID"))")
+                    completion(true)
                 }
-                return true
             }
-        } catch {
-            debugPrint("Error accessing Realm database: \(error.localizedDescription)")
         }
-        return false
+    }
+
+    func signUp(firstName: String, lastName: String, email: String, password: String, completion: @escaping (Bool) -> Void) {
+        Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
+            if let error = error {
+                print("Error registering: \(error.localizedDescription)")
+                completion(false)
+            } else if let user = authResult?.user {
+                self.user = User(id: user.uid, firstName: firstName, lastName: lastName, email: email)
+                UserDefaults.standard.set(user.uid, forKey: "userID")
+               
+                completion(true)
+            }
+        }
+    }
+
+    func logout() {
+        do {
+            try Auth.auth().signOut()
+            
+        } catch {
+            print("Error signing out: \(error.localizedDescription)")
+        }
     }
     
     func addItem(title: String, dateAdded: Date, fromUser: String) {

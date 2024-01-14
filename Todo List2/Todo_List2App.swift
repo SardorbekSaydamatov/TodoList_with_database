@@ -6,29 +6,32 @@
 //
 
 import SwiftUI
+import Firebase
 
 @main
 struct Todo_List2App: App {
     @StateObject private var listViewModel = ListViewModel()
-    
     let dataService = DataService.shared
     
     init() {
-            dataService.initializeDefaultUsers()
-        debugPrint("Test")
-        }
+        FirebaseApp.configure()
+    }
     
     var body: some Scene {
         WindowGroup {
-            
-            if UserDefaults.standard.bool(forKey: "LoggedIn") {
-                TasksView()
-                    .environmentObject(listViewModel)
-            } else {
-                LoginView(listViewModel: listViewModel)
-                    .environmentObject(listViewModel)
-            }
-            
+            ContentView()
+                .onAppear(perform: {
+                    Auth.auth().addStateDidChangeListener {  auth, user in
+                        if let user = user {
+                            listViewModel.user = User(id: user.uid, firstName: "", lastName: "", email: user.email!)
+                            listViewModel.isUserLoggedIn = true
+                        } else {
+                            listViewModel.user = nil
+                            listViewModel.isUserLoggedIn = false
+                        }
+                    }
+                })
+                .environmentObject(listViewModel)
         }
     }
 }

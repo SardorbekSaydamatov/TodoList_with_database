@@ -49,54 +49,52 @@ struct TasksView: View {
         return formatter
     }
     var body: some View {
-      //  NavigationView(content: {
+        VStack {
+            headerView
+            
+            ZStack {
+                taskListView
+                    .padding(.top, 20)
+                Button(action: {
+                    isPresented = true
+                }, label: {
+                    Image("vector2")
+                        .frame(width: 14, height: 14)
+                })
+                .frame(width: 50, height: 50)
+                .background(Color.init(uiColor: .opaqueSeparator))
+                .clipShape(Circle())
+                .padding(.leading, 300)
+                .padding(.top, 600)
+            }
+        }
+        .background(content:{Color.init(uiColor: .systemBackground)
+                .ignoresSafeArea()
+        })
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("Todo List").font(
+            Font.custom("Raleway", size: 14)
+                .weight(.semibold)
+        )
+        .sheet(isPresented: $datePresented) {
             VStack {
-                headerView
-                    
-                ZStack {
-                    taskListView
-                        .padding(.top, 20)
-                    Button(action: {
-                        isPresented = true
-                    }, label: {
-                        Image("vector2")
-                            .frame(width: 14, height: 14)
-                    })
-                    .frame(width: 50, height: 50)
-                    .background(Color.init(uiColor: .opaqueSeparator))
-                    .clipShape(Circle())
-                    .padding(.leading, 300)
-                    .padding(.top, 600)
+                DatePicker("", selection: $temporaryDate, displayedComponents: .date)
+                    .datePickerStyle(.graphical)
+                    .presentationDetents([.height(400)])
+                    .foregroundStyle(Color.white)
+                    .colorInvert()
+                    .colorMultiply(Color.white)
+                
+                
+                Button("Submit") {
+                    selectedDate = temporaryDate
+                    datePresented.toggle()
                 }
             }
-            .background(content:{Color.init(uiColor: .systemBackground)
-                    .ignoresSafeArea()
-            })
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationTitle("Todo List").font(
-                Font.custom("Raleway", size: 14)
-                    .weight(.semibold)
-            )
-            .sheet(isPresented: $datePresented) {
-                VStack {
-                    DatePicker("", selection: $temporaryDate, displayedComponents: .date)
-                        .datePickerStyle(.graphical)
-                        .presentationDetents([.height(400)])
-                        .foregroundStyle(Color.white)
-                        .colorInvert()
-                        .colorMultiply(Color.white)
-                        
-                    
-                    Button("Submit") {
-                        selectedDate = temporaryDate
-                        datePresented.toggle()
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.init(uiColor: .label))
-                .foregroundStyle(Color.orange)
-            }
-       // })
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.init(uiColor: .label))
+            .foregroundStyle(Color.orange)
+        }
         .fullScreenCover(isPresented: $isPresented, content: {
             AddView()
         })
@@ -112,6 +110,7 @@ struct TasksView: View {
                 }
                 VStack {
                         Button(action: {
+                            UserDefaults.standard.removeObject(forKey: "userID")
                             listViewModel.logout()
                             dismiss()
                         }, label: {
@@ -147,7 +146,7 @@ struct TasksView: View {
             } else {
                 ForEach(
                     tasks.filter { task in
-                        return task.createdDate.isInSameDay(withDate: self.selectedDate) && task.fromUser == UserDefaults.standard.string(forKey: "userName")
+                        return task.createdDate.isInSameDay(withDate: self.selectedDate) && task.fromUser == UserDefaults.standard.string(forKey: "userID")
                     }.sorted(by: {
                         $0.isCompleted.value < $1.isCompleted.value
                     })

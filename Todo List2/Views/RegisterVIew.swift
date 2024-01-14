@@ -6,16 +6,18 @@
 //
 
 import SwiftUI
+import Firebase
 
 struct RegisterVIew: View {
     @State private var userName: String = ""
     @State private var lastName: String = ""
     @State private var email: String = ""
-    @State private var passwod: String = ""
+    @State private var password: String = ""
     @State private var registrationSucceded = false
     @State private var showingAlert = false
+    @EnvironmentObject var listViewModel: ListViewModel
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var listVIewModel: ListViewModel
+   
     var body: some View {
             VStack {
                 
@@ -67,7 +69,7 @@ struct RegisterVIew: View {
                 .frame(width: 335, height: 50)
                 .background(Color.init(uiColor: .secondarySystemBackground))
                 .cornerRadius(10)
-            SecureField("Password", text: $passwod)
+            SecureField("Password", text: $password)
                 .padding(.leading)
                 .frame(width: 335, height: 50)
                 .background(Color.init(uiColor: .secondarySystemBackground))
@@ -79,19 +81,13 @@ struct RegisterVIew: View {
         
         VStack {
             Button(action: {
-                if listVIewModel.registerUser(firstName: userName, lastName: lastName, email: email, password: passwod) {
-                    registrationSucceded = true
-                    userName = ""
-                    lastName = ""
-                    email = ""
-                    passwod = ""
-                } else {
-                    showingAlert = true
-                    userName = ""
-                    lastName = ""
-                    email = ""
-                    passwod = ""
-                }
+                listViewModel.signUp(firstName: userName, lastName: lastName, email: email, password: password) { success in
+                        if success {
+                            registrationSucceded = true
+                        } else {
+                            showingAlert = true
+                        }
+                    }
             }, label: {
                 Text("Sign up")
             })

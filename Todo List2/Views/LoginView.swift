@@ -9,15 +9,15 @@ import SwiftUI
 import RealmSwift
 
 struct LoginView: View {
-    
+    @EnvironmentObject private var listViewModel2: ListViewModel
     @State private var emailTapped = false
     @State private var passwordTapped = false
     @State private var email = ""
     @State private var password = ""
     @State private var showAlert = false
     @State private var isAuthenticated = false
-    @State private var registerPresented = false
-
+   // @State private var registerPresented = false
+    
     var listViewModel: ListViewModel
     var body: some View {
         NavigationStack {
@@ -92,21 +92,23 @@ struct LoginView: View {
     
     private var signInButton: some View {
         Button(action: {
-                if listViewModel.authenticateUser(email: email, password: password) {
+            listViewModel.signIn(email: email, password: password) { success in
+                if success {
                     isAuthenticated = true
                 } else {
                     showAlert = true
                 }
-            }, label: {
-                Text("Sign in")
-            })
-            .frame(width: 335 ,height: 50)
-            .background(content:{Color.init(uiColor: .secondarySystemBackground)})
-            .foregroundStyle(Color.init(uiColor: .label))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
-            .padding(.top, 40)
-        }
+            }
+        }, label: {
+            Text("Sign in")
+        })
+        .frame(width: 335 ,height: 50)
+        .background(content:{Color.init(uiColor: .secondarySystemBackground)})
+        .foregroundStyle(Color.init(uiColor: .label))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .padding(.top, 40)
     }
+}
 
 #Preview {
     LoginView(listViewModel: ListViewModel())

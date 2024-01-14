@@ -14,35 +14,33 @@ class DataService {
     
     private init() {
         initializeRealm()
-        initializeDefaultUsers()
+        // initializeDefaultUsers()
     }
     
     func initializeRealm() {
-        let config = Realm.Configuration(
-            schemaVersion: 5,
-            migrationBlock: { migration, oldSchemaVersion in
-                if oldSchemaVersion < 5 {
-
-                   
-                }
-            }
-        )
+        var config = Realm.Configuration()
+        config.schemaVersion = 6 // Set the schema version to a higher value than the previous version
+        config.migrationBlock = { migration, oldSchemaVersion in
+            // Handle any necessary data migrations here
+        }
         Realm.Configuration.defaultConfiguration = config
-        
-        do {
-            let _ = try Realm()
-        } catch {
-            debugPrint("Error initializing Realm: \(error.localizedDescription)")
-        }
-    }
-    
-    func initializeDefaultUsers() {
-        Realm.new?.tryWrite { realm in
-            let user1 = User(id: UUID().uuidString, firstName: "John", lastName: "Doe", email: "Test@1.com", password: "password1")
-            let user2 = User(id: UUID().uuidString, firstName: "Jane", lastName: "Smith", email: "Test@2.com", password: "password2")
-            
-            realm.add(user1)
-            realm.add(user2)
-        }
     }
 }
+//
+//        do {
+//            let _ = try Realm()
+//        } catch {
+//            debugPrint("Error initializing Realm: \(error.localizedDescription)")
+//        }
+//    }
+//    
+//    func initializeDefaultUsers() {
+//        Realm.new?.tryWrite { realm in
+//            let user1 = User(id: UUID().uuidString, firstName: "John", lastName: "Doe", email: "Test@1.com", password: "password1")
+//            let user2 = User(id: UUID().uuidString, firstName: "Jane", lastName: "Smith", email: "Test@2.com", password: "password2")
+//            
+//            realm.add(user1)
+//            realm.add(user2)
+//        }
+//    }
+//}

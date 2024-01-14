@@ -33,23 +33,16 @@ class DToDo: Object, Identifiable {
     }
 }
 
-class User: Object {
-    @Persisted(primaryKey: true) var id: String
-    @Persisted var firstName: String
-    @Persisted var lastName: String
-    @Persisted var email: String
-    @Persisted var password: String
+struct User: Identifiable {
+    var id: String
+    var firstName: String
+    var lastName: String
+    var email: String
     
-    init(id: String, firstName: String, lastName: String, email: String, password: String) {
+    init(id: String, firstName: String, lastName: String, email: String) {
+        self.id = id
         self.firstName = firstName
         self.lastName = lastName
         self.email = email
-        self.password = password
-        super.init()
-        self.id = id
-    }
-    
-    override init() {
-        super.init()
     }
 }

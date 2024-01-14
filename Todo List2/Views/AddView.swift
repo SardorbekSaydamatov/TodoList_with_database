@@ -89,7 +89,7 @@ struct AddView: View {
          if !newTask.isEmpty {
              let currentDate = Date()
              let newTaskDate = Calendar.current.date(bySettingHour: Calendar.current.component(.hour, from: currentDate), minute: Calendar.current.component(.minute, from: currentDate), second: 0, of: selectedDate) ?? selectedDate
-             listViewModel.addItem(title: newTask, dateAdded: newTaskDate, fromUser: UserDefaults.standard.string(forKey: "userName")!)
+             listViewModel.addItem(title: newTask, dateAdded: newTaskDate, fromUser: UserDefaults.standard.string(forKey: "userID")!)
              newTask = ""
          }
      }
